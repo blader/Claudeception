@@ -8,13 +8,19 @@ This skill fixes that. When Claude Code discovers something non-obvious (a debug
 
 ### Step 1: Clone the skill
 
-**User-level (recommended)**
+**Linux/Mac (user-level, recommended)**
 
 ```bash
 git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
 ```
 
-**Project-level**
+**Windows (PowerShell)**
+
+```powershell
+git clone https://github.com/blader/Claudeception.git "$env:USERPROFILE\.claude\skills\claudeception"
+```
+
+**Project-level (any platform)**
 
 ```bash
 git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
@@ -23,6 +29,8 @@ git clone https://github.com/blader/Claudeception.git .claude/skills/claudecepti
 ### Step 2: Set up the activation hook (recommended)
 
 The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
+
+#### Linux/Mac
 
 1. Create the hooks directory and copy the script:
 
@@ -50,6 +58,38 @@ chmod +x ~/.claude/hooks/claudeception-activator.sh
   }
 }
 ```
+
+#### Windows
+
+The bash script doesn't work on Windows. Use the Node.js version instead:
+
+1. Create the hooks directory and copy the script (PowerShell):
+
+```powershell
+mkdir -Force "$env:USERPROFILE\.claude\hooks"
+cp "$env:USERPROFILE\.claude\skills\claudeception\scripts\claudeception-activator.js" "$env:USERPROFILE\.claude\hooks\"
+```
+
+2. Add the hook to your Claude settings (`%USERPROFILE%\.claude\settings.json`):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node %USERPROFILE%\\.claude\\hooks\\claudeception-activator.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
 
 If you already have a `settings.json`, merge the `hooks` configuration into it.
 
