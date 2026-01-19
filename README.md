@@ -8,13 +8,19 @@ This skill fixes that. When Claude Code discovers something non-obvious (a debug
 
 ### Step 1: Clone the skill
 
-**User-level (recommended)**
+**Linux/Mac (user-level, recommended)**
 
 ```bash
 git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
 ```
 
-**Project-level**
+**Windows (PowerShell)**
+
+```powershell
+git clone https://github.com/blader/Claudeception.git "$env:USERPROFILE\.claude\skills\claudeception"
+```
+
+**Project-level (any platform)**
 
 ```bash
 git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
@@ -24,7 +30,65 @@ git clone https://github.com/blader/Claudeception.git .claude/skills/claudecepti
 
 The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
 
-1. Create the hooks directory and copy the script:
+#### All Platforms (Node.js - Recommended)
+
+The Node.js version works on Linux, Mac, and Windows since Claude Code requires Node.js.
+
+**Linux/Mac:**
+
+```bash
+mkdir -p ~/.claude/hooks
+cp ~/.claude/skills/claudeception/scripts/claudeception-activator.js ~/.claude/hooks/
+```
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/claudeception-activator.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Windows (PowerShell):**
+
+```powershell
+mkdir -Force "$env:USERPROFILE\.claude\hooks"
+cp "$env:USERPROFILE\.claude\skills\claudeception\scripts\claudeception-activator.js" "$env:USERPROFILE\.claude\hooks\"
+```
+
+Add to `%USERPROFILE%\.claude\settings.json`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node %USERPROFILE%\\.claude\\hooks\\claudeception-activator.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+#### Linux/Mac Alternative (Bash)
+
+If you prefer bash, you can use the shell script instead:
 
 ```bash
 mkdir -p ~/.claude/hooks
@@ -32,7 +96,7 @@ cp ~/.claude/skills/claudeception/scripts/claudeception-activator.sh ~/.claude/h
 chmod +x ~/.claude/hooks/claudeception-activator.sh
 ```
 
-2. Add the hook to your Claude settings (`~/.claude/settings.json`):
+Add to `~/.claude/settings.json`:
 
 ```json
 {
@@ -50,6 +114,8 @@ chmod +x ~/.claude/hooks/claudeception-activator.sh
   }
 }
 ```
+
+---
 
 If you already have a `settings.json`, merge the `hooks` configuration into it.
 
