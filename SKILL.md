@@ -405,13 +405,9 @@ Search: "Next.js getServerSideProps error handling best practices 2026"
 ---
 name: nextjs-server-side-error-debugging
 description: |
-  Debug getServerSideProps and getStaticProps errors in Next.js. Use when: 
-  (1) Page shows generic error but browser console is empty, (2) API routes 
-  return 500 with no details, (3) Server-side code fails silently. Check 
-  terminal/server logs instead of browser for actual error messages.
-author: Claude Code
-version: 1.0.0
-date: 2024-01-15
+  Use when: (1) Next.js page shows generic error but browser console is empty,
+  (2) API routes return 500 with no details, (3) server-side code fails silently.
+  Symptoms: getServerSideProps errors not visible, empty console with error page.
 ---
 
 # Next.js Server-Side Error Debugging
@@ -426,12 +422,21 @@ debugging frustrating when you're looking in the wrong place.
 - Using getServerSideProps, getStaticProps, or API routes
 - Error only occurs on navigation/refresh, not on client-side transitions
 
+## When NOT to Use
+- Client-side React errors (these DO show in browser console)
+- Build-time errors (these show in terminal during `next build`)
+- TypeScript errors (these show in IDE and terminal)
+
 ## Solution
 1. Check the terminal where `npm run dev` is running—errors appear there
 2. For production, check server logs (Vercel dashboard, CloudWatch, etc.)
 3. Add try-catch with console.error in server-side functions for clarity
-4. Use Next.js error handling: return `{ notFound: true }` or `{ redirect: {...} }` 
+4. Use Next.js error handling: return `{ notFound: true }` or `{ redirect: {...} }`
    instead of throwing
+
+## Common Mistakes
+**Mistake:** Adding console.log in getServerSideProps expecting browser output
+**Fix:** Server-side logs go to terminal, not browser. Use terminal or server logs.
 
 ## Verification
 After checking terminal, you should see the actual stack trace with file 
