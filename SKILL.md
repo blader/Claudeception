@@ -343,13 +343,33 @@ Before finalizing a skill, verify:
 - [ ] References section included if web sources were consulted
 - [ ] Current best practices (post-2025) incorporated when relevant
 
-## Anti-Patterns to Avoid
+## Common Mistakes
 
-- **Over-extraction**: Not every task deserves a skill. Mundane solutions don't need preservation.
-- **Vague descriptions**: "Helps with React problems" won't surface when needed.
-- **Unverified solutions**: Only extract what actually worked.
-- **Documentation duplication**: Don't recreate official docs; link to them and add what's missing.
-- **Stale knowledge**: Mark skills with versions and dates; knowledge can become outdated.
+### Mistake 1: Over-extraction
+**Problem:** Extracting every solution, creating maintenance burden
+**Fix:** Apply quality gates strictly - reusable AND non-trivial AND verified
+
+### Mistake 2: Vague descriptions
+**Problem:** "Helps with React problems" won't surface when needed
+**Fix:** Include specific triggers, error messages, symptoms
+
+### Mistake 3: Workflow summaries in description
+**Problem:** Claude follows description instead of reading skill body
+**Fix:** Description contains ONLY trigger conditions, never workflow
+
+### Mistake 4: Unsupported frontmatter fields
+**Problem:** Adding author/version/date fields that Claude ignores
+**Fix:** Only use `name`, `description`, and supported fields like `allowed-tools`
+
+### Rationalization Table
+
+| Excuse | Reality |
+|--------|---------|
+| "Better to have it documented" | Skills have maintenance cost. Be selective. |
+| "This might be useful someday" | Extract when needed, not speculatively. |
+| "I'll be thorough and add all fields" | Extra fields are ignored. Follow spec exactly. |
+| "Description should explain what it does" | Description is for discovery, not documentation. |
+| "Official docs are too long to read" | Skills complement docs, don't replace them. |
 
 ## Skill Lifecycle
 
