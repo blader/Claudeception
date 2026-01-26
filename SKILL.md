@@ -485,5 +485,24 @@ After completing any significant task, ask yourself:
 
 If yes to any, invoke this skill immediately.
 
+## Testing Verification
+
+**Approach:** Scenario-based testing with subagents
+
+**Test scenarios run:**
+1. **Trigger recognition:** Does Claude invoke claudeception after non-obvious debugging?
+2. **Quality gates:** Does Claude skip extraction for trivial/documented solutions?
+3. **Template compliance:** Do extracted skills follow the correct template?
+4. **CSO compliance:** Do extracted skill descriptions avoid workflow summaries?
+
+**Evidence:**
+- Tested with verify-technical-claims skill creation (2026-01-26)
+- Identified frontmatter violations, CSO issues, missing sections
+- Fixes informed by case study analysis
+
+**Ongoing validation:**
+- Each skill created by claudeception should be reviewed against checklist
+- Quality Gates section provides self-check criteria
+
 Remember: The goal is continuous, autonomous improvement. Every valuable discovery
 should have the opportunity to benefit future work sessions.
