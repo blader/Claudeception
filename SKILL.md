@@ -258,7 +258,36 @@ description: |
   Turborepo, and npm workspaces.
 ```
 
-### Step 6: Save the Skill
+### Step 6: Apply CSO (Claude Search Optimization)
+
+**Why CSO matters:** Claude reads skill descriptions to decide which skills to load. Poor descriptions = skills never found.
+
+**The Critical Rule:**
+> Description = WHEN to use, NOT WHAT it does
+
+**CSO Violation Examples:**
+
+| Bad (summarizes workflow) | Good (triggers only) |
+|---------------------------|----------------------|
+| "Validates tokens and handles auth errors" | "Use when auth fails with 401/403 or token expired" |
+| "Creates skills from session learnings" | "Use when task required non-obvious investigation" |
+| "Runs tests and reports coverage" | "Use when tests fail unexpectedly or coverage drops" |
+
+**Why this matters:** Testing revealed that when descriptions summarize workflow, Claude may follow the description instead of reading the full skill. The skill body becomes documentation Claude skips.
+
+**Keyword Coverage:**
+Include words Claude would search for:
+- Error messages: "ENOENT", "401 Unauthorized", "timeout"
+- Symptoms: "flaky", "hangs", "silent failure"
+- Tools/frameworks: "Next.js", "Prisma", "Jest"
+- Synonyms: "timeout/hang/freeze", "auth/authentication/login"
+
+**Token Efficiency:**
+- Keep SKILL.md under 500 lines
+- Move heavy reference material to separate files
+- Use cross-references instead of duplicating content
+
+### Step 7: Save the Skill
 
 Save new skills to the appropriate location:
 
