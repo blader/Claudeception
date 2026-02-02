@@ -370,15 +370,34 @@ Include words Claude would search for:
 - Move heavy reference material to separate files
 - Use cross-references instead of duplicating content
 
-### Step 7: Save the Skill
+### Step 7: Determine Placement and Save
 
-Save new skills to the appropriate location:
+Before saving, run through the placement decision:
 
-- **Project-specific skills**: `.claude/skills/[skill-name]/SKILL.md`
-- **User-wide skills**: `~/.claude/skills/[skill-name]/SKILL.md`
+**1. Check the decision tree (see "Knowledge Placement Decision" section above)**
 
-Include any supporting scripts in a `scripts/` subdirectory if the skill benefits from 
-executable helpers.
+If placement is **CLAUDE.md**:
+- Draft the 1-3 line instruction
+- Ask: "Should this go in global `~/.claude/CLAUDE.md` or project `.claude/CLAUDE.md`?"
+- Add the instruction to the appropriate file
+
+If placement is **skill**:
+- Proceed to step 2
+
+**2. Determine skill location**
+
+For skills, choose based on your typical stack:
+
+| Stack | Location | Typical Stack Examples |
+|-------|----------|------------------------|
+| Typical | `~/.claude/skills/[name]/SKILL.md` | NestJS, TypeScript, Python, Docker, GitLab |
+| Unusual | `.claude/skills/[name]/SKILL.md` | Godot, game engines, niche frameworks |
+
+**3. Save the skill**
+
+- Create directory: `mkdir -p [location]/[skill-name]`
+- Write SKILL.md with complete template
+- Include any supporting scripts in `scripts/` subdirectory if needed
 
 ## Retrospective Mode
 
