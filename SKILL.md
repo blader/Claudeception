@@ -7,7 +7,7 @@ description: |
   non-obvious debugging, workarounds, or trial-and-error discovery. Creates new Claude Code
   skills when valuable, reusable knowledge is identified.
 author: Claude Code
-version: 3.0.0
+version: 3.1.0
 allowed-tools:
   - Read
   - Write
@@ -68,12 +68,22 @@ Before extracting, verify the knowledge meets these criteria:
 **Goal:** Find related skills before creating. Decide: update or create new.
 
 ```sh
-# Skill directories (project-first, then user-level)
-SKILL_DIRS=(
+# Resolve custom skills directory from config (project-level wins)
+CUSTOM_SKILLS_DIR=""
+for CONFIG in ".claude/claudeception.json" "$HOME/.claude/claudeception.json"; do
+  if [ -f "$CONFIG" ]; then
+    CUSTOM_SKILLS_DIR=$(python3 -c "import json,sys; d=json.load(open('$CONFIG')); print(d.get('skillsDir',''))" 2>/dev/null)
+    [ -n "$CUSTOM_SKILLS_DIR" ] && break
+  fi
+done
+
+# Build directory list (custom first if configured)
+SKILL_DIRS=()
+[ -n "$CUSTOM_SKILLS_DIR" ] && SKILL_DIRS+=("$CUSTOM_SKILLS_DIR")
+SKILL_DIRS+=(
   ".claude/skills"
   "$HOME/.claude/skills"
   "$HOME/.codex/skills"
-  # Add other tool paths as needed
 )
 
 # List all skills
@@ -214,13 +224,46 @@ description: |
 
 ### Step 6: Save the Skill
 
-Save new skills to the appropriate location:
+Determine the save location using this 3-tier priority:
 
-- **Project-specific skills**: `.claude/skills/[skill-name]/SKILL.md`
-- **User-wide skills**: `~/.claude/skills/[skill-name]/SKILL.md`
+1. Check `.claude/claudeception.json`, then `~/.claude/claudeception.json` for a `skillsDir` field
+2. **If found** → save to `[skillsDir]/[skill-name]/SKILL.md`
+3. **If not found** → fall back to `.claude/skills/[skill-name]/SKILL.md` (project) or `~/.claude/skills/[skill-name]/SKILL.md` (user-wide)
 
-Include any supporting scripts in a `scripts/` subdirectory if the skill benefits from 
+After saving, confirm the path to the user. If no config was found, append:
+> Tip: create `.claude/claudeception.json` with `{"skillsDir": "/your/path"}` to save skills to a custom location.
+
+Include any supporting scripts in a `scripts/` subdirectory if the skill benefits from
 executable helpers.
+
+## Configuration
+
+Claudeception supports a JSON config file to customize where skills are saved and searched.
+
+### Config file locations (project-level wins)
+
+1. `.claude/claudeception.json` — project-specific
+2. `~/.claude/claudeception.json` — user-wide fallback
+
+### Format
+
+```json
+{ "skillsDir": "/your/custom/path" }
+```
+
+### Examples
+
+```json
+{ "skillsDir": "/home/user/team-skills" }
+{ "skillsDir": "./shared/skills" }
+{ "skillsDir": "C:/Users/name/my-skills-library" }
+```
+
+### Behavior
+
+- **Step 1 search**: If `skillsDir` is configured, it is prepended to the search list so custom skills are found first.
+- **Step 6 save**: Skills are written to `[skillsDir]/[skill-name]/SKILL.md` instead of the defaults.
+- **No config**: Falls back silently to `.claude/skills/` or `~/.claude/skills/` and shows a one-line tip.
 
 ## Retrospective Mode
 
@@ -267,6 +310,7 @@ Before finalizing a skill, verify:
 - [ ] Web research conducted when appropriate (for technology-specific topics)
 - [ ] References section included if web sources were consulted
 - [ ] Current best practices (post-2025) incorporated when relevant
+- [ ] Skill saved to correct location (custom skillsDir if configured, otherwise default)
 
 ## Anti-Patterns to Avoid
 
