@@ -12,6 +12,8 @@
 #   1. Copy this script to $env:USERPROFILE\.claude\hooks\
 #   2. Add to $env:USERPROFILE\.claude\settings.json (see README for details)
 
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 Write-Output @"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧠 MANDATORY SKILL EVALUATION REQUIRED
