@@ -84,6 +84,47 @@ chmod +x .claude/hooks/claudeception-activator.sh
 
 If you already have a `settings.json`, merge the `hooks` configuration into it.
 
+### Windows / PowerShell
+
+The activation hook is also available as a native PowerShell script for Windows users.
+
+1. Clone the skill (if you haven't already):
+
+```powershell
+git clone https://github.com/blader/Claudeception.git "$env:USERPROFILE\.claude\skills\claudeception"
+```
+
+2. Create the hooks directory and copy the PowerShell script:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\hooks"
+Copy-Item "$env:USERPROFILE\.claude\skills\claudeception\scripts\claudeception-activator.ps1" `
+          "$env:USERPROFILE\.claude\hooks\"
+```
+
+3. Add the hook to your Claude settings (`~/.claude/settings.json`):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -File %USERPROFILE%\\.claude\\hooks\\claudeception-activator.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+> **Note:** Use `pwsh` (PowerShell 7+) rather than `powershell` for best compatibility. If you have existing hooks in `settings.json`, merge the `UserPromptSubmit` array into your existing `hooks` object.
+
+**Project-level installation** follows the same pattern — copy the `.ps1` to `.claude/hooks/` in your repo and reference it with a relative path in `.claude/settings.json`.
+
 The hook injects a reminder on every prompt that tells Claude to evaluate whether the current task produced extractable knowledge. This achieves higher activation rates than relying on semantic description matching alone.
 
 ## Usage
