@@ -120,6 +120,7 @@ After identifying the knowledge, decide which extraction path to take:
 |---------------|------|
 | All 4 Quality Criteria met (Reusable + Non-trivial + Specific + Verified) | **Full skill** → continue to Step 3 |
 | Specific is met, plus at least 1 other criterion has partial evidence | **Tentative note** → see below |
+| Specific is met but no other criterion shows even partial evidence | **Discard** — too thin to be useful |
 | Cannot describe a clear trigger + action (Specific not met) | **Discard** — not worth capturing |
 
 "Partial evidence" means at least Non-trivial or Reusable shows initial signs (e.g., "this pattern
@@ -255,7 +256,7 @@ When `/claudeception` is invoked at the end of a session:
    - Existing notes that match observations from this session (update confidence)
    - Notes meeting promotion threshold (confidence >= 0.7, observations >= 2 from distinct sessions)
    - Notes declined for promotion twice in separate sessions (skip auto-suggest; see `resources/tentative-knowledge.md` § Promotion Declined Twice)
-   - Stale notes past expiry thresholds (flag for cleanup; promotion takes precedence over stale)
+   - Stale notes past expiry thresholds (flag for cleanup or auto-delete per expiry rules; promotion takes precedence over stale)
 3. **Identify Candidates**: List potential skills (from session + promoted tentative notes)
 4. **Prioritize**: Focus on the highest-value, most reusable knowledge
 5. **Extract**: Create skills for the top candidates (typically 1-3 per session)
