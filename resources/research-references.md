@@ -26,8 +26,8 @@ This document compiles the academic research that informed the design of Claudec
 
 ### CASCADE: Cumulative Agentic Skill Creation through Autonomous Development and Evolution
 
-**Authors**: [Research Team]  
-**Published**: December 2024  
+**Authors**: Huang, Chen, Fei, Li, Schwaller, Ceder  
+**Published**: December 2025  
 **URL**: https://arxiv.org/abs/2512.23880
 
 **Key Contribution**: Self-evolving agentic framework demonstrating the transition from "LLM + tool use" to "LLM + skill acquisition."
