@@ -80,8 +80,9 @@ This document compiles the academic research that informed the design of Claudec
 
 ### EvoFSM: Controllable Self-Evolution for Deep Research with Finite State Machines
 
-**Authors**: [Research Team]  
-**Published**: 2024
+**Authors**: Zhang, Yuan, Guo, Yu, Xu, Chen, Li, Yang, Guan, Tang, Hu, Zhang, Chen, Wang  
+**Published**: January 2026  
+**URL**: https://arxiv.org/abs/2601.09465
 
 **Key Contribution**: Self-evolving framework with experience pools for continuous learning.
 
