@@ -5,9 +5,11 @@ description: |
   Triggers: (1) /claudeception command to review session learnings, (2) "save this as a skill"
   or "extract a skill from this", (3) "what did we learn?", (4) After any task involving
   non-obvious debugging, workarounds, or trial-and-error discovery. Creates new Claude Code
-  skills when valuable, reusable knowledge is identified.
+  skills when valuable, reusable knowledge is identified. Also captures tentative instinct
+  notes for emerging patterns not yet ready for full skill extraction — lightweight YAML notes
+  with confidence scoring in memory/tentative/.
 author: Claude Code
-version: 3.0.0
+version: 3.1.0
 allowed-tools:
   - Read
   - Write
@@ -110,6 +112,28 @@ Analyze what was learned:
 - What would someone need to know to solve this faster next time?
 - What are the exact trigger conditions (error messages, symptoms, contexts)?
 
+### Step 2.5: Triage — Full Skill vs Tentative Note
+
+After identifying the knowledge, decide which extraction path to take:
+
+| Criteria Check | Path |
+|---------------|------|
+| All 4 Quality Criteria met (Reusable + Non-trivial + Specific + Verified) | **Full skill** → continue to Step 3 |
+| Specific is met, plus at least 1 other criterion has partial evidence | **Tentative note** → see below |
+| Cannot describe a clear trigger + action (Specific not met) | **Discard** — not worth capturing |
+
+"Partial evidence" means at least Non-trivial or Reusable shows initial signs (e.g., "this pattern
+likely applies elsewhere but hasn't been verified across contexts"). A 3-of-4 case (e.g., Reusable +
+Non-trivial + Specific but not Verified) takes the tentative path — missing any criterion disqualifies
+from full skill extraction.
+
+**Tentative note path** (skips Steps 3-6):
+1. Ensure `memory/tentative/` directory exists (Write tool creates parent directories automatically)
+2. Check for existing notes: match by filename `{name}.yaml`, fall back to LLM-assessed trigger similarity
+3. If match found: update `confidence`, add observation entry, update `last_seen`
+4. If new: create YAML note from `resources/instinct-template.yaml` with initial confidence 0.4
+5. See `resources/tentative-knowledge.md` for detailed confidence rules and edge cases
+
 ### Step 3: Research Best Practices (When Appropriate)
 
 Before creating the skill, search the web for current information when:
@@ -124,7 +148,7 @@ Before creating the skill, search the web for current information when:
 **When to search:**
 - The topic involves specific technologies, frameworks, or tools
 - You're uncertain about current best practices
-- The solution might have changed after January 2025 (knowledge cutoff)
+- The solution might have changed after May 2025 (knowledge cutoff)
 - There might be official documentation or community standards
 - You want to verify your understanding is current
 
@@ -227,10 +251,15 @@ executable helpers.
 When `/claudeception` is invoked at the end of a session:
 
 1. **Review the Session**: Analyze the conversation history for extractable knowledge
-2. **Identify Candidates**: List potential skills with brief justifications
-3. **Prioritize**: Focus on the highest-value, most reusable knowledge
-4. **Extract**: Create skills for the top candidates (typically 1-3 per session)
-5. **Summarize**: Report what skills were created and why
+2. **Scan Tentative Notes**: Check `memory/tentative/*.yaml` for:
+   - Existing notes that match observations from this session (update confidence)
+   - Notes meeting promotion threshold (confidence >= 0.7, observations >= 2 from distinct sessions)
+   - Notes declined for promotion twice in separate sessions (skip auto-suggest; see `resources/tentative-knowledge.md` § Promotion Declined Twice)
+   - Stale notes past expiry thresholds (flag for cleanup; promotion takes precedence over stale)
+3. **Identify Candidates**: List potential skills (from session + promoted tentative notes)
+4. **Prioritize**: Focus on the highest-value, most reusable knowledge
+5. **Extract**: Create skills for the top candidates (typically 1-3 per session)
+6. **Summarize**: Report what skills were created, tentative notes updated, and promotions suggested
 
 ## Self-Reflection Prompts
 
@@ -267,6 +296,8 @@ Before finalizing a skill, verify:
 - [ ] Web research conducted when appropriate (for technology-specific topics)
 - [ ] References section included if web sources were consulted
 - [ ] Current best practices (post-2025) incorporated when relevant
+- [ ] If knowledge doesn't meet all 4 Quality Criteria: considered tentative note path before discarding
+- [ ] Tentative notes contain valid trigger condition and confidence in [0.1, 0.95]
 
 ## Anti-Patterns to Avoid
 
@@ -280,10 +311,55 @@ Before finalizing a skill, verify:
 
 Skills should evolve:
 
+0. **Tentative**: Lightweight YAML note with confidence scoring; may be promoted or expire
 1. **Creation**: Initial extraction with documented verification
 2. **Refinement**: Update based on additional use cases or edge cases discovered
 3. **Deprecation**: Mark as deprecated when underlying tools/patterns change
 4. **Archival**: Remove or archive skills that are no longer relevant
+
+## Tentative Knowledge Management
+
+Tentative notes capture emerging patterns that don't yet meet all 4 Quality Criteria. They live
+in `memory/tentative/` as lightweight YAML files, accumulating confidence through repeated
+observations until they are promoted to full skills or expire.
+
+**Schema**: See `resources/instinct-template.yaml` for the YAML template with field documentation.
+
+### Confidence Rules (Summary)
+
+| Event | Delta |
+|-------|-------|
+| Initial observation | 0.4 (starting value) |
+| Re-observed in same context | +0.15 |
+| Observed in different context | +0.20 |
+| User explicit confirmation | +0.30 (confidence only; does NOT count as an observation) |
+| Counter-example observed | −0.20 |
+
+Confidence is clamped to [0.1, 0.95] after each adjustment.
+
+### Promotion
+
+A tentative note is eligible for promotion when **both** conditions are met:
+- `confidence >= 0.7`
+- `observations >= 2` from **>= 2 distinct sessions or dates**
+
+During Retrospective Mode, eligible notes are presented for user confirmation. If confirmed,
+the note's content pre-fills Steps 3-6 to create a full skill; the YAML file is then deleted.
+
+### Expiry
+
+| Condition | Action |
+|-----------|--------|
+| 90 days since `last_seen`, no new observation | Mark stale; prompt for cleanup |
+| 180 days since `last_seen` | Auto-delete |
+| `confidence < 0.3` AND 60 days since `last_seen` | Early delete |
+
+If a note simultaneously meets promotion thresholds and stale criteria, **promotion takes precedence**.
+
+### Detailed Rules
+
+See `resources/tentative-knowledge.md` for complete rules on confidence arithmetic edge cases,
+promotion protocol, expiry details, deduplication strategy, and cross-project aggregation placeholder.
 
 ## Example: Complete Extraction Flow
 
@@ -291,18 +367,20 @@ Skills should evolve:
 aren't showing in the browser console because they're server-side, and the actual error is
 in the terminal.
 
-**Step 1 - Identify the Knowledge**:
+**Step 1 - Check for Existing Skills**: No matching skills found.
+
+**Step 2 - Identify the Knowledge**:
 - Problem: Server-side errors don't appear in browser console
 - Non-obvious aspect: Expected behavior for server-side code in Next.js
 - Trigger: Generic error page with empty browser console
 
-**Step 2 - Research Best Practices**:
+**Step 3 - Research Best Practices**:
 Search: "Next.js getServerSideProps error handling best practices 2026"
 - Found official docs on error handling
 - Discovered recommended patterns for try-catch in data fetching
 - Learned about error boundaries for server components
 
-**Step 3-5 - Structure and Save**:
+**Steps 4-6 - Structure and Save**:
 
 **Extraction**:
 
@@ -352,6 +430,9 @@ and line numbers.
 - [Next.js Data Fetching: getServerSideProps](https://nextjs.org/docs/pages/building-your-application/data-fetching/get-server-side-props)
 - [Next.js Error Handling](https://nextjs.org/docs/pages/building-your-application/routing/error-handling)
 ```
+
+> **Tentative path**: If Step 2.5 routes to tentative, skip Steps 3-6 and create a YAML note per
+> `resources/instinct-template.yaml` with initial confidence 0.4. See Step 2.5 for the full flow.
 
 ## Integration with Workflow
 

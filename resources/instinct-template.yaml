@@ -1,0 +1,27 @@
+# TEMPLATE — do not place in memory/tentative/
+# Tentative Knowledge Note Template for Claudeception
+# Storage: ~/.claude/projects/<project>/memory/tentative/<name>.yaml
+# Created by claudeception when knowledge doesn't yet meet all 4 Quality Criteria
+
+name: example-pattern-name          # kebab-case, descriptive; used as filename
+trigger: |
+  When [specific condition/symptom/error message]
+action: |
+  Then [what to do / what the pattern suggests]
+confidence: 0.4                     # float [0.1, 0.95]; initial = 0.4
+observations:                       # each real observation event (NOT user confirmations)
+  - date: "2026-04-05"             # ISO 8601
+    summary: "Observed X while doing Y"
+    session: "brief session context"
+first_seen: "2026-04-05"           # ISO 8601; set on creation
+last_seen: "2026-04-05"            # ISO 8601; updated on each observation
+
+tags:                               # categorization for retrieval
+  - domain-tag                      # e.g., "r-tidyverse", "git", "windows"
+  - context-tag                     # e.g., "debugging", "configuration"
+
+# --- Optional fields ---
+source: "session"                   # how created: session | manual | retrospective
+related_skills: []                  # links to existing skills if partially overlapping
+counter_examples: []                # observations contradicting this pattern (triggers -0.20)
+promotion_declined: []              # ISO 8601 dates when user declined promotion; >= 2 entries → auto-skip

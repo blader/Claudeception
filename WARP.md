@@ -4,12 +4,14 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-Claudeception is a **Claude Code skill** for continuous learning—it enables Claude Code to autonomously extract and preserve learned knowledge into reusable skills. It is not an application codebase but rather a skill definition with documentation and examples.
+Claudeception is a **Claude Code skill** for continuous learning—it enables Claude Code to autonomously extract and preserve learned knowledge into reusable skills. It also captures emerging patterns as tentative YAML notes with confidence scoring, promoting them to full skills after repeated observations. It is not an application codebase but rather a skill definition with documentation and examples.
 
 ## Key Files
 
 - `SKILL.md` — The main skill definition (YAML frontmatter + instructions). This is what Claude Code loads.
 - `resources/skill-template.md` — Template for creating new skills
+- `resources/instinct-template.yaml` — YAML template for tentative knowledge notes
+- `resources/tentative-knowledge.md` — Detailed rules for confidence scoring, promotion, and expiry
 - `examples/` — Sample extracted skills demonstrating proper format
 
 ## Skill File Format

@@ -115,6 +115,16 @@ Save what we just learned as a skill
 
 Not every task produces a skill. It only extracts knowledge that required actual discovery (not just reading docs), will help with future tasks, has clear trigger conditions, and has been verified to work.
 
+### Tentative Knowledge
+
+Not all patterns are ready for full skill extraction. When a discovery meets some but not all quality criteria (e.g., observed once but not yet verified across contexts), Claudeception saves it as a **tentative note** — a lightweight YAML file in `memory/tentative/` with a confidence score.
+
+- **Confidence scoring**: starts at 0.4, increases with repeated observations (+0.15 same context, +0.20 different context) and user confirmation (+0.30), decreases with counter-examples (−0.20)
+- **Automatic promotion**: when confidence reaches 0.7 with 2+ observations from distinct sessions, the note is suggested for promotion to a full skill
+- **Expiry**: notes that go 180 days without new observations are auto-deleted; low-confidence notes expire sooner
+
+See `resources/instinct-template.yaml` for the YAML schema and `resources/tentative-knowledge.md` for detailed rules.
+
 ## Research
 
 The idea comes from academic work on skill libraries for AI agents.
