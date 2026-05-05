@@ -20,31 +20,22 @@ git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudecep
 git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
 ```
 
-### Step 2: Set up the activation hook (recommended)
+### Step 2: Set up the nudge hook (recommended)
 
-The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
+The skill activates via semantic matching, but a `Stop` hook adds a quiet one-line reminder once per session — after the first response — to consider running `/claudeception` if the session produced something worth saving.
 
-#### User-level setup (recommended)
-
-1. Create the hooks directory and copy the script:
-
-```bash
-mkdir -p ~/.claude/hooks
-cp ~/.claude/skills/claudeception/scripts/claudeception-activator.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/claudeception-activator.sh
-```
-
-2. Add the hook to your global Claude settings (`~/.claude/settings.json`):
+Add the hook to your global Claude settings (`~/.claude/settings.json`):
 
 ```json
 {
   "hooks": {
-    "UserPromptSubmit": [
+    "Stop": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/claudeception-activator.sh"
+            "command": "bash ~/.claude/skills/claudeception/scripts/claudeception-nudge.sh"
           }
         ]
       }
@@ -53,38 +44,7 @@ chmod +x ~/.claude/hooks/claudeception-activator.sh
 }
 ```
 
-#### Project-level setup
-
-1. Create the hooks directory inside your project and copy the script:
-
-```bash
-mkdir -p .claude/hooks
-cp .claude/skills/claudeception/scripts/claudeception-activator.sh .claude/hooks/
-chmod +x .claude/hooks/claudeception-activator.sh
-```
-
-2. Add the hook to your project settings (`.claude/settings.json` in the repo):
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-If you already have a `settings.json`, merge the `hooks` configuration into it.
-
-The hook injects a reminder on every prompt that tells Claude to evaluate whether the current task produced extractable knowledge. This achieves higher activation rates than relying on semantic description matching alone.
+If you already have a `settings.json`, merge the `hooks` key into it.
 
 ## Usage
 

@@ -33,10 +33,10 @@ There are no build, test, or lint commands because this is documentation and con
 - `typescript-circular-dependency/`: Import cycle detection and resolution
 - Each example demonstrates the complete skill format
 
-**Activation Hook (`scripts/claudeception-activator.sh`)**
-- Bash script that injects reminder text into Claude Code sessions
-- Prompts evaluation after each user request for extractable knowledge
-- Installed in `~/.claude/hooks/` and referenced in `~/.claude/settings.json`
+**Nudge Hook (`scripts/claudeception-nudge.sh`)**
+- Bash script registered as a `Stop` hook in `~/.claude/settings.json`
+- Emits a single-line reminder once per session (keyed to `session_id` via a tmpfile)
+- Silent on every subsequent turn in the same session
 
 ### Skill File Format
 
@@ -146,14 +146,13 @@ Example skills in `examples/` should:
 - Show both good trigger condition descriptions and poor ones (in commit history/docs)
 - Have working code examples that can be verified
 
-### Modifying the Activation Hook
+### Modifying the Nudge Hook
 
-The hook script (`scripts/claudeception-activator.sh`) outputs reminder text that Claude Code sees on every user prompt. Changes to this script affect:
-- How aggressively the skill self-activates
-- What evaluation criteria Claude uses to decide if knowledge is worth extracting
-- The user experience (intrusive vs. subtle reminders)
+The hook script (`scripts/claudeception-nudge.sh`) emits a one-line reminder once per session via the `Stop` event. Changes to this script affect:
+- The wording of the reminder users see
+- The frequency (currently once per session, keyed to `session_id`)
 
-Keep the reminder concise but clear about the non-negotiable evaluation requirement.
+Keep the reminder short — one line is enough. The goal is a nudge, not a banner.
 
 ## Skill Lifecycle
 
